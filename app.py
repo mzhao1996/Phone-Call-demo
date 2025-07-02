@@ -62,7 +62,7 @@ def voice():
     response.record(
         action=f"{SERVER_URL}/process_recording",
         maxLength=30,
-        playBeep=True
+        playBeep=False
     )
     return str(response)
 
@@ -70,19 +70,13 @@ def voice():
 def process_recording():
     recording_url = request.form['RecordingUrl']
     # 下载录音
-    audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{datetime.now().strftime('%Y%m%d%H%M%S')}.wav")
+    audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{datetime.now().strftime('%Y%m%d%H%M%S')}.mp3")
     import requests
-    r = requests.get(recording_url + '.wav')
+    r = requests.get(recording_url + '.mp3')
     with open(audio_file, 'wb') as f:
         f.write(r.content)
-    # 用ffmpeg转码为标准wav（16kHz, 单声道）
-    converted_file = audio_file.replace('.wav', '_converted.wav')
-    import subprocess
-    subprocess.run([
-        'ffmpeg', '-y', '-i', audio_file, '-ar', '16000', '-ac', '1', converted_file
-    ], check=True)
     # STT 转写
-    customer_text = transcribe_audio(converted_file)
+    customer_text = transcribe_audio(audio_file)
     # 读取 prompt
     with open('client_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -108,7 +102,7 @@ def process_recording():
     response.record(
         action=f"{SERVER_URL}/process_recording",
         maxLength=30,
-        playBeep=True
+        playBeep=False
     )
     return str(response)
 
