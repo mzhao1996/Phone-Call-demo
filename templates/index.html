@@ -19,6 +19,9 @@
         <div id="transcript"></div>
     </div>
     <script>
+        window.onload = function() {
+            document.getElementById('transcript').innerHTML = '';
+        }
         const form = document.getElementById('callForm');
         const statusDiv = document.getElementById('status');
         const transcriptDiv = document.getElementById('transcript');
