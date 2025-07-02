@@ -32,12 +32,11 @@ def index():
 
 @app.route('/start_call', methods=['POST'])
 def start_call():
-    data = request.json or {}
-    customer_name = data.get('customer_name', 'Meng')
-    phone_number = data.get('phone_number', '9023163387')
-    prompt = data.get('prompt', "What did you have for lunch? Was it delicious?")
+    data = request.json
+    customer_name = data['customer_name']
+    phone_number = data['phone_number']
+    prompt = data['prompt']
     # 保存表单数据
-    data = {'customer_name': customer_name, 'phone_number': phone_number, 'prompt': prompt}
     with open('client_data.json', 'w', encoding='utf-8') as f:
         json.dump(data, f)
     # 发起呼叫
