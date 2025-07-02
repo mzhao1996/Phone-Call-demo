@@ -8,7 +8,6 @@ from services.tts import generate_tts
 from services.stt import transcribe_audio
 from services.chat import get_gpt_response
 from datetime import datetime
-from pydub import AudioSegment
 
 load_dotenv()
 
@@ -76,12 +75,8 @@ def process_recording():
     r = requests.get(recording_url + '.mp3')
     with open(audio_file, 'wb') as f:
         f.write(r.content)
-    # 用pydub转码为标准mp3
-    converted_file = audio_file.replace('.mp3', '_converted.mp3')
-    audio = AudioSegment.from_file(audio_file)
-    audio.export(converted_file, format='mp3')
     # STT 转写
-    customer_text = transcribe_audio(converted_file)
+    customer_text = transcribe_audio(audio_file)
     # 读取 prompt
     with open('client_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
