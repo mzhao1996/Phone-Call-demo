@@ -1,0 +1,8 @@
+body { font-family: Arial, sans-serif; background: #f4f4f4; }
+.container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+h1 { text-align: center; }
+form label { display: block; margin: 15px 0 5px; }
+input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; }
+button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+button:hover { background: #0056b3; }
+#transcript { background: #f9f9f9; padding: 15px; border-radius: 6px; min-height: 80px; margin-top: 10px; } 

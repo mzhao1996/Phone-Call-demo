@@ -1,0 +1,6 @@
+Flask
+openai
+twilio
+elevenlabs
+python-dotenv
+requests 
