@@ -12,7 +12,7 @@ def transcribe_audio(audio_path):
         'xi-api-key': ELEVENLABS_STT_API_KEY
     }
     with open(audio_path, 'rb') as f:
-        files = {'audio': f}
+        files = {'file': f}  # ElevenLabs要求参数名为file
         data = {'model_id': 'eleven_multilingual_v1'}  # 官方推荐模型ID
         response = requests.post(url, headers=headers, files=files, data=data)
     if response.status_code == 200:
