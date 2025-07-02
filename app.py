@@ -5,7 +5,7 @@ from twilio.twiml.voice_response import VoiceResponse, Play, Record
 from twilio.rest import Client
 from dotenv import load_dotenv
 from services.tts import generate_tts
-from services.stt import transcribe_audio, transcribe_from_url
+from services.stt import transcribe_from_url
 from services.chat import get_gpt_response
 from datetime import datetime
 
@@ -76,7 +76,7 @@ def process_recording():
     with open(audio_file, 'wb') as f:
         f.write(r.content)
     # STT 转写
-    customer_text = transcribe_audio(audio_file)
+    customer_text = transcribe_from_url(recording_url)
     # 读取 prompt
     with open('client_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
