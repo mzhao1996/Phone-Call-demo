@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 
 def transcribe_from_url(recording_url: str):
     """
@@ -13,8 +15,8 @@ def transcribe_from_url(recording_url: str):
     Returns the transcribed text. Raises Exception on failure.
     """
     tmp_path = '/tmp/twilio_recording.mp3'
-    # Download the recording
-    r = requests.get(recording_url + '.mp3')
+    # Download the recording with Twilio Auth
+    r = requests.get(recording_url, auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
     if r.status_code != 200:
         raise Exception(f"Failed to download recording: {r.status_code} {r.text}")
     with open(tmp_path, 'wb') as f:
