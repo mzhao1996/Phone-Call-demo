@@ -5,3 +5,4 @@ twilio
 
 # for production server
 gunicorn 
+openai
