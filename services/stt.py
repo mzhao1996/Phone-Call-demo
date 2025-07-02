@@ -13,8 +13,11 @@ def transcribe_audio(audio_path):
     }
     with open(audio_path, 'rb') as f:
         files = {'audio': f}
-        response = requests.post(url, headers=headers, files=files)
+        data = {'model_id': 'eleven_multilingual_v1'}  # 官方推荐模型ID
+        response = requests.post(url, headers=headers, files=files, data=data)
     if response.status_code == 200:
         return response.json().get('text', '')
     else:
         raise Exception(f"STT failed: {response.text}") 
+    
+
