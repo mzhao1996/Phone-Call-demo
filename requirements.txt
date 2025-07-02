@@ -3,4 +3,7 @@ openai
 twilio
 elevenlabs
 python-dotenv
-requests 
+requests
+
+# for production server
+gunicorn 
