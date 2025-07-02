@@ -1,9 +1,7 @@
 Flask
-openai
-twilio
-elevenlabs
-python-dotenv
 requests
+python-dotenv
+twilio
 
 # for production server
 gunicorn 

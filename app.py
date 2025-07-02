@@ -5,7 +5,7 @@ from twilio.twiml.voice_response import VoiceResponse, Play, Record
 from twilio.rest import Client
 from dotenv import load_dotenv
 from services.tts import generate_tts
-from services.stt import transcribe_audio
+from services.stt import transcribe_audio, transcribe_from_url
 from services.chat import get_gpt_response
 from datetime import datetime
 
@@ -120,6 +120,24 @@ def get_transcript():
         return jsonify({'transcript': transcript})
     else:
         return jsonify({'transcript': []})
+
+@app.route('/twilio/recording', methods=['POST'])
+def twilio_recording():
+    """
+    Handle Twilio webhook for recording. Extract RecordingUrl and From, transcribe audio, print result.
+    Return 200 OK on success, 400/500 on error.
+    """
+    try:
+        recording_url = request.form.get('RecordingUrl')
+        from_number = request.form.get('From')
+        if not recording_url or not from_number:
+            return jsonify({'error': 'Missing RecordingUrl or From'}), 400
+        text = transcribe_from_url(recording_url)
+        print(f"Transcription from {from_number}: {text}")
+        return jsonify({'text': text}), 200
+    except Exception as e:
+        print(f"Error in /twilio/recording: {e}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True) 
