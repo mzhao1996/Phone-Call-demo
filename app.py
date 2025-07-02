@@ -57,6 +57,9 @@ def voice():
     gpt_reply = get_gpt_response(prompt, [])
     # TTS 合成
     audio_path = generate_tts(gpt_reply)
+    # 确保音频文件已生成
+    if not os.path.exists(audio_path):
+        return "<Response><Say>AI audio not ready.</Say></Response>", 500
     response = VoiceResponse()
     response.play(f"{SERVER_URL}/audio/{os.path.basename(audio_path)}")
     response.record(
@@ -69,10 +72,14 @@ def voice():
 @app.route('/process_recording', methods=['POST'])
 def process_recording():
     recording_url = request.form['RecordingUrl']
+    recording_sid = request.form.get('RecordingSid', datetime.now().strftime('%Y%m%d%H%M%S'))
     # 下载录音
-    audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{datetime.now().strftime('%Y%m%d%H%M%S')}.mp3")
+    audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{recording_sid}.mp3")
     import requests
     r = requests.get(recording_url + '.mp3')
+    if r.status_code != 200:
+        print(f"Failed to download recording: {r.status_code} {r.text}")
+        return "<Response><Say>Recording download failed.</Say></Response>", 500
     with open(audio_file, 'wb') as f:
         f.write(r.content)
     # STT 转写
@@ -97,6 +104,9 @@ def process_recording():
         json.dump(transcript, f, ensure_ascii=False, indent=2)
     # TTS 合成
     audio_path = generate_tts(gpt_reply)
+    # 确保音频文件已生成
+    if not os.path.exists(audio_path):
+        return "<Response><Say>AI audio not ready.</Say></Response>", 500
     response = VoiceResponse()
     response.play(f"{SERVER_URL}/audio/{os.path.basename(audio_path)}")
     response.record(
