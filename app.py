@@ -75,8 +75,14 @@ def process_recording():
     r = requests.get(recording_url + '.wav')
     with open(audio_file, 'wb') as f:
         f.write(r.content)
+    # 用ffmpeg转码为标准wav（16kHz, 单声道）
+    converted_file = audio_file.replace('.wav', '_converted.wav')
+    import subprocess
+    subprocess.run([
+        'ffmpeg', '-y', '-i', audio_file, '-ar', '16000', '-ac', '1', converted_file
+    ], check=True)
     # STT 转写
-    customer_text = transcribe_audio(audio_file)
+    customer_text = transcribe_audio(converted_file)
     # 读取 prompt
     with open('client_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
