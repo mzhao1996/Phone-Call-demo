@@ -16,6 +16,7 @@ def transcribe_from_url(recording_url: str):
     """
     tmp_path = '/tmp/twilio_recording.mp3'
     # Download the recording with Twilio Auth
+    print(f"Downloading recording from =================================================>{recording_url}")
     r = requests.get(recording_url, auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
     if r.status_code != 200:
         raise Exception(f"Failed to download recording: {r.status_code} {r.text}")
