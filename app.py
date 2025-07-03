@@ -8,6 +8,7 @@ from services.tts import generate_tts
 from services.stt import transcribe_from_url
 from services.chat import get_gpt_response
 from datetime import datetime
+import time
 
 load_dotenv()
 
@@ -76,6 +77,7 @@ def process_recording():
     # 下载录音（加认证）
     audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{recording_sid}.mp3")
     import requests
+    time.sleep(0.5)
     r = requests.get(recording_url + '.mp3', auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
     if r.status_code != 200:
         print(f"Failed to download recording: {r.status_code} {r.text}")

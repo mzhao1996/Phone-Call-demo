@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -22,6 +23,7 @@ def generate_tts(text, filename=None):
         'text': text,
         'voice_settings': {'stability': 0.5, 'similarity_boost': 0.5}
     }
+    time.sleep(0.5)
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:
         with open(output_path, 'wb') as f:
