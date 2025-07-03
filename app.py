@@ -73,10 +73,10 @@ def voice():
 def process_recording():
     recording_url = request.form['RecordingUrl']
     recording_sid = request.form.get('RecordingSid', datetime.now().strftime('%Y%m%d%H%M%S'))
-    # 下载录音
+    # 下载录音（加认证）
     audio_file = os.path.join(app.config['UPLOAD_FOLDER'], f"recording_{recording_sid}.mp3")
     import requests
-    r = requests.get(recording_url + '.mp3')
+    r = requests.get(recording_url + '.mp3', auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
     if r.status_code != 200:
         print(f"Failed to download recording: {r.status_code} {r.text}")
         return "<Response><Say>Recording download failed.</Say></Response>", 500
