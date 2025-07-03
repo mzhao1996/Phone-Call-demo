@@ -56,6 +56,12 @@ def voice():
     prompt = data['prompt']
     # 用 GPT 生成第一句
     gpt_reply = get_gpt_response(prompt, [])
+    # 保存 AI 第一条回复到 transcript
+    transcript_path = os.path.join(app.config['TRANSCRIPT_FOLDER'], f"{data['phone_number']}.json")
+    transcript = []
+    transcript.append({'role': 'assistant', 'text': gpt_reply})
+    with open(transcript_path, 'w', encoding='utf-8') as f:
+        json.dump(transcript, f, ensure_ascii=False, indent=2)
     # TTS 合成
     audio_path = generate_tts(gpt_reply)
     # 确保音频文件已生成
