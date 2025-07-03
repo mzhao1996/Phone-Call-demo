@@ -6,7 +6,7 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 from services.tts import generate_tts
 from services.stt import transcribe_from_url
-from services.chat import get_gpt_response
+from services.chat import get_gpt_response, limit_sentences
 from datetime import datetime
 import time
 from threading import Thread
@@ -59,6 +59,7 @@ def voice():
     # 异步后台生成AI第一句话和TTS
     def generate_ai_first_sentence():
         gpt_reply = get_gpt_response(prompt, [])
+        gpt_reply = limit_sentences(gpt_reply, max_sentences=3)
         transcript_path = os.path.join(app.config['TRANSCRIPT_FOLDER'], f"{phone_number}.json")
         transcript = [{'role': 'assistant', 'text': gpt_reply}]
         with open(transcript_path, 'w', encoding='utf-8') as f:
@@ -122,6 +123,7 @@ def process_recording():
     transcript.append({'role': 'customer', 'text': customer_text})
     # GPT 回复
     gpt_reply = get_gpt_response(prompt, transcript)
+    gpt_reply = limit_sentences(gpt_reply, max_sentences=3)
     transcript.append({'role': 'assistant', 'text': gpt_reply})
     # 保存 transcript
     with open(transcript_path, 'w', encoding='utf-8') as f:
