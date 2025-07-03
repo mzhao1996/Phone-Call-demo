@@ -9,6 +9,7 @@ from services.stt import transcribe_from_url
 from services.chat import get_gpt_response
 from datetime import datetime
 import time
+from threading import Thread
 
 load_dotenv()
 
@@ -53,20 +54,35 @@ def voice():
     # 读取表单数据
     with open('client_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
+    phone_number = data['phone_number']
     prompt = data['prompt']
-    # 用 GPT 生成第一句
-    gpt_reply = get_gpt_response(prompt, [])
-    # 保存 AI 第一条回复到 transcript
-    transcript_path = os.path.join(app.config['TRANSCRIPT_FOLDER'], f"{data['phone_number']}.json")
-    transcript = []
-    transcript.append({'role': 'assistant', 'text': gpt_reply})
-    with open(transcript_path, 'w', encoding='utf-8') as f:
-        json.dump(transcript, f, ensure_ascii=False, indent=2)
-    # TTS 合成
-    audio_path = generate_tts(gpt_reply)
-    # 确保音频文件已生成
-    if not os.path.exists(audio_path):
-        return "<Response><Say>AI audio not ready.</Say></Response>", 500
+    # 异步后台生成AI第一句话和TTS
+    def generate_ai_first_sentence():
+        gpt_reply = get_gpt_response(prompt, [])
+        transcript_path = os.path.join(app.config['TRANSCRIPT_FOLDER'], f"{phone_number}.json")
+        transcript = [{'role': 'assistant', 'text': gpt_reply}]
+        with open(transcript_path, 'w', encoding='utf-8') as f:
+            json.dump(transcript, f, ensure_ascii=False, indent=2)
+        generate_tts(gpt_reply)
+    Thread(target=generate_ai_first_sentence).start()
+    # 先播放本地mp3，播放完后跳转到/voice_next
+    response = VoiceResponse()
+    response.play(f"{SERVER_URL}/audio/ElevenLabs_2025-07-03T17_27_31_british%20woman_gen_sp100_s50_sb75_v3.mp3")
+    response.redirect(f"{SERVER_URL}/voice_next")
+    return str(response)
+
+@app.route('/voice_next', methods=['POST'])
+def voice_next():
+    # 读取表单数据
+    with open('client_data.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    phone_number = data['phone_number']
+    # 读取AI第一句话的TTS音频
+    transcript_path = os.path.join(app.config['TRANSCRIPT_FOLDER'], f"{phone_number}.json")
+    with open(transcript_path, 'r', encoding='utf-8') as f:
+        transcript = json.load(f)
+    gpt_reply = transcript[0]['text']
+    audio_path = generate_tts(gpt_reply)  # 如果已生成会直接返回路径
     response = VoiceResponse()
     response.play(f"{SERVER_URL}/audio/{os.path.basename(audio_path)}")
     response.record(
