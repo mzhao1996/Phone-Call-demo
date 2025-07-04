@@ -2,57 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Phone Assistant</title>
+    <title>Webhook Data Viewer</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>AI Phone Assistant</h1>
-        <form id="callForm">
-            <label>Customer Name:<input type="text" name="customer_name" required></label><br>
-            <label>Phone Number:<input type="text" name="phone_number" required></label><br>
-            <label>Prompt:<textarea name="prompt" required></textarea></label><br>
-            <button type="submit">Start Call</button>
-        </form>
-        <div id="status"></div>
-        <h2>Transcript</h2>
-        <div id="transcript"></div>
+        <h1>Webhook 数据展示</h1>
+        {% if webhook_data and webhook_data|length > 0 %}
+            <ul>
+            {% for item in webhook_data %}
+                <li><pre>{{ item | tojson(indent=2, ensure_ascii=False) }}</pre></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>暂无收到任何 webhook 数据。</p>
+        {% endif %}
+        <hr>
+        <p>POST 数据到 <code>/webhook</code> 即可在此页面看到。</p>
     </div>
-    <script>
-        window.onload = function() {
-            document.getElementById('transcript').innerHTML = '';
-        }
-        const form = document.getElementById('callForm');
-        const statusDiv = document.getElementById('status');
-        const transcriptDiv = document.getElementById('transcript');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            statusDiv.textContent = 'Calling...';
-            transcriptDiv.innerHTML = '';
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            const res = await fetch('/start_call', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            const result = await res.json();
-            if(result.status === 'calling') {
-                statusDiv.textContent = 'Call in progress...';
-                pollTranscript(data.phone_number);
-            } else {
-                statusDiv.textContent = 'Call failed.';
-            }
-        };
-        function pollTranscript(phone) {
-            let interval = setInterval(async () => {
-                const res = await fetch(`/get_transcript?phone_number=${phone}`);
-                const data = await res.json();
-                if(data.transcript && data.transcript.length > 0) {
-                    transcriptDiv.innerHTML = data.transcript.map(turn => `<b>${turn.role}:</b> ${turn.text}<br>`).join('');
-                }
-            }, 3000);
-        }
-    </script>
 </body>
 </html> 
