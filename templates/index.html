@@ -11,7 +11,7 @@
         {% if webhook_data and webhook_data|length > 0 %}
             <ul>
             {% for item in webhook_data %}
-                <li><pre>{{ item | tojson(indent=2) }}</pre></li>
+                <li><pre>{{ item | tojson(indent=2, ensure_ascii=False) }}</pre></li>
             {% endfor %}
             </ul>
         {% else %}
