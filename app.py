@@ -30,6 +30,11 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 @app.route('/')
 def index():
+    # 清除所有 transcript 文件
+    transcript_folder = app.config['TRANSCRIPT_FOLDER']
+    for filename in os.listdir(transcript_folder):
+        if filename.endswith('.json'):
+            os.remove(os.path.join(transcript_folder, filename))
     return render_template('index.html')
 
 @app.route('/start_call', methods=['POST'])
