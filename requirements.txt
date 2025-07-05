@@ -1,3 +1,8 @@
 Flask
+requests
+python-dotenv
+twilio
+
 # for production server
-gunicorn
+gunicorn 
+openai
